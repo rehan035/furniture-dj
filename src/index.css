@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-surface: #fcf9f2;
+  --color-surface-dim: #dcdad3;
+  --color-surface-bright: #fcf9f2;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f6f3ec;
+  --color-surface-container: #f0eee7;
+  --color-surface-container-high: #ebe8e1;
+  --color-surface-container-highest: #e5e2db;
+  --color-on-surface: #1c1c18;
+  --color-on-surface-variant: #504440;
+  --color-outline: #827470;
+  --color-outline-variant: #d4c3be;
+  --color-primary: #27130b;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #3e271e;
+  --color-on-primary-container: #ae8d80;
+  --color-secondary: #885200;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ffb561;
+  --color-secondary-fixed: #ffdcbc;
+  --color-on-secondary-fixed: #2c1700;
+  --color-tertiary: #071c0e;
+  --color-tertiary-container: #1c3122;
+  --color-background: #fcf9f2;
+}
+
+.cane-pattern {
+  background-image: radial-gradient(#27130b 0.75px, transparent 0.75px),
+    radial-gradient(#27130b 0.75px, #fcf9f2 0.75px);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}
+
