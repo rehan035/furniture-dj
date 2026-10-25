@@ -223,6 +223,7 @@ app.post('/api/github/logout', (_req: Request, res: Response) => {
 function getRepositoryFiles(): Array<{ path: string; content: string }> {
   const filesToRead = [
     'package.json',
+    'package-lock.json',
     'index.html',
     'vite.config.ts',
     'tsconfig.json',
@@ -275,7 +276,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
+          cache: 'npm'
       - name: Install dependencies
         run: npm install
       - name: Build Vite site
