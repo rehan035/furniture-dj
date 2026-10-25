@@ -3,33 +3,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   ArrowRight,
   Check,
-  Copy,
-  Download,
+  Compass,
   ExternalLink,
-  FileCode,
-  FolderGit2,
-  Github,
-  Lock,
-  MapPin,
+  Minus,
   Phone,
   Plus,
-  Minus,
   Send,
-  ShieldCheck,
   ShoppingBag,
-  Sparkles,
+  SlidersHorizontal,
   X,
-  Clock,
-  Layers,
-  Compass,
-  Hammer,
-  Truck,
-  MessageSquare,
 } from 'lucide-react';
+
+import heroLoungeImg from './assets/images/hero_islamabad_rattan_lounge_1792954419737.jpg';
+import loungeChairImg from './assets/images/product_cane_lounge_chair_1792954419921.jpg';
+import diningSuiteImg from './assets/images/product_rattan_dining_suite_1792954421110.jpg';
+import foldingScreenImg from './assets/images/product_cane_folding_screen_1792954422288.jpg';
+
+const ARTISAN_WEAVING_IMG =
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuCHYr3_pUwmAUT4i_tDrMD4kpaW5b5LXW6sQLWqy0JYorJzxqvfTlhMNcKyLj3CqbY6cvqUYXvBojlsLRiCG0b3AGyIMAf-9kBzsDRJzzmDyf3WzBRZ9nYaLRh7Q4aMTvVLLj79TpdUb5BqFyh7ZRq4Kw8CbQYTyYcI5UGv9BF7fTXL5YgOircU0150VoBQ_BpDw0qsJZpz_Ey0UFiM_IFd9MKZ_cgZNacKqMWqoXTWNDamI-vgRaLT';
 
 interface ProductItem {
   id: string;
@@ -43,6 +38,7 @@ interface ProductItem {
   weavePattern: string;
   availability: string;
   description: string;
+  architecturalNote: string;
   imageUrl: string;
   svgVariant: 'lounge' | 'dining' | 'weaver' | 'screen';
 }
@@ -55,23 +51,41 @@ interface CartItem {
   customNotes: string;
 }
 
-interface GitHubStatus {
-  authenticated: boolean;
-  oauthConfigured: boolean;
-  redirectUri: string;
-  user?: {
-    login: string;
-    name: string;
-    avatarUrl?: string;
-    profileUrl?: string;
-  };
-}
+const TIMBER_SWATCHES = [
+  {
+    name: 'Kiln-Dried Burma Teak',
+    hex: '#6E4726',
+    grainTone: 'Warm honey-amber heartwood with tight straight grain',
+  },
+  {
+    name: 'Aged Deep Teak',
+    hex: '#27130B',
+    grainTone: 'Hand-rubbed espresso oil finish for heritage interiors',
+  },
+  {
+    name: 'Seasoned Pakistani Sheesham',
+    hex: '#4E2E18',
+    grainTone: 'High-density rosewood figure conditioned for Islamabad climate',
+  },
+];
 
-interface RepoFile {
-  path: string;
-  sizeBytes: number;
-  content: string;
-}
+const WEAVE_SWATCHES = [
+  {
+    name: 'Octagonal French Cane',
+    code: '8-Point Open Breathable Mesh',
+    detail: 'Traditional hand-laced split rattan peel with open geometric ventilation.',
+  },
+  {
+    name: 'Close Diamond Cane Webbing',
+    code: 'Tight Architectural Privacy Weave',
+    detail: 'Dense diagonal cane matrix suited for screens, cabinet doors, and headboards.',
+  },
+  {
+    name: 'Double-Wall Rattan Core',
+    code: 'Heavy Load-Bearing Joinery Weave',
+    detail: 'Reinforced dual-layer weaving engineered for hospitality and dining armchairs.',
+  },
+];
 
 const CATALOG_PRODUCTS: ProductItem[] = [
   {
@@ -86,9 +100,9 @@ const CATALOG_PRODUCTS: ProductItem[] = [
     weavePattern: 'Octagonal French Cane',
     availability: 'Made to Order',
     description:
-      'Ergonomically balanced low-profile lounge chair with hand-tensioned octagonal rattan cane backrest and mortise-and-tenon solid teak framing.',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuALSYvkosYUK_Y2I3F67CCXmRWd2uhtY8sbOOJTjPHekpwpSGO3rvnEiolv3m_JfrwoqtnTfiCBRNy1LBQCQUyBEksRy3BrycR_-U45jNhaFpL8xNtU_Sfr3_ezECdbeyql_wfwk_QtaLmHTFnXQXra_tDgTKB8kUIs2JZI2AufUyBW_I1MSgSa9GRrVO7Hn8rwMHaRvMW77HoN06AAEj6LxuQ4TAa7ZwpjrYKR9pW-2Xe2RummEVSR',
+      'Sculptural low-profile lounge armchair featuring hand-tensioned octagonal rattan cane webbing, sweeping contoured armrests, and a raw ecru linen seat cushion.',
+    architecturalNote: 'Mortise-and-tenon solid timber chassis with concealed perimeter spline groove.',
+    imageUrl: loungeChairImg,
     svgVariant: 'lounge',
   },
   {
@@ -100,12 +114,12 @@ const CATALOG_PRODUCTS: ProductItem[] = [
     leadTime: 'Handcrafted: 3–4 Weeks',
     dimensions: '210 cm L × 100 cm W × 76 cm H',
     timber: 'Seasoned Pakistani Sheesham',
-    weavePattern: 'Double-Wall Rattan Mesh',
+    weavePattern: 'Double-Wall Rattan Core',
     availability: 'Atelier Commission',
     description:
-      'Six handcrafted cane-back dining armchairs paired with a solid planked hardwood dining table conditioned for Islamabad climate stability.',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuALSYvkosYUK_Y2I3F67CCXmRWd2uhtY8sbOOJTjPHekpwpSGO3rvnEiolv3m_JfrwoqtnTfiCBRNy1LBQCQUyBEksRy3BrycR_-U45jNhaFpL8xNtU_Sfr3_ezECdbeyql_wfwk_QtaLmHTFnXQXra_tDgTKB8kUIs2JZI2AufUyBW_I1MSgSa9GRrVO7Hn8rwMHaRvMW77HoN06AAEj6LxuQ4TAa7ZwpjrYKR9pW-2Xe2RummEVSR',
+      'Six handcrafted woven cane-back dining armchairs paired with a solid planked hardwood dining table conditioned for year-round stability.',
+    architecturalNote: 'Double-woven rattan peel seat bases with removable upholstered linen pads.',
+    imageUrl: diningSuiteImg,
     svgVariant: 'dining',
   },
   {
@@ -120,29 +134,83 @@ const CATALOG_PRODUCTS: ProductItem[] = [
     weavePattern: 'Close Diamond Cane Webbing',
     availability: 'Custom Sizing',
     description:
-      'Floor-to-ceiling articulated room divider filtering natural sunlight through tight geometric split-cane webbing and brass barrel hinges.',
-    imageUrl:
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuCHYr3_pUwmAUT4i_tDrMD4kpaW5b5LXW6sQLWqy0JYorJzxqvfTlhMNcKyLj3CqbY6cvqUYXvBojlsLRiCG0b3AGyIMAf-9kBzsDRJzzmDyf3WzBRZ9nYaLRh7Q4aMTvVLLj79TpdUb5BqFyh7ZRq4Kw8CbQYTyYcI5UGv9BF7fTXL5YgOircU0150VoBQ_BpDw0qsJZpz_Ey0UFiM_IFd9MKZ_cgZNacKqMWqoXTWNDamI-vgRaLT',
+      'Three-panel articulated room divider filtering natural daylight through intricate split-cane webbing and solid brass double-action hinges.',
+    architecturalNote: 'Available in custom panel heights up to 275 cm for floor-to-ceiling zoning.',
+    imageUrl: foldingScreenImg,
     svgVariant: 'screen',
+  },
+  {
+    id: 'potohar-veranda-salon-pair',
+    name: 'Potohar Veranda Cane Salon Pair & Side Table',
+    category: 'Seating',
+    categoryLabel: 'Lounge & Seating',
+    pricePkr: 152000,
+    leadTime: 'Handcrafted: 3 Weeks',
+    dimensions: '76 cm W × 84 cm D × 80 cm H (Chairs)',
+    timber: 'Kiln-Dried Burma Teak',
+    weavePattern: 'Octagonal French Cane',
+    availability: 'Made to Order',
+    description:
+      'Matched pair of scrolled-arm colonial cane easy chairs accompanied by a dual-tier woven rattan gallery side table for sunlit drawing rooms.',
+    architecturalNote: 'Hand-bent steam-curved armrests with binder-cane wrapped joints.',
+    imageUrl: heroLoungeImg,
+    svgVariant: 'lounge',
+  },
+  {
+    id: 'shakarparian-cane-credenza',
+    name: 'Shakarparian Woven Cane & Teak Credenza',
+    category: 'Architectural',
+    categoryLabel: 'Architectural Joinery',
+    pricePkr: 138000,
+    leadTime: 'Handcrafted: 3–4 Weeks',
+    dimensions: '185 cm L × 48 cm D × 82 cm H',
+    timber: 'Seasoned Pakistani Sheesham',
+    weavePattern: 'Close Diamond Cane Webbing',
+    availability: 'Atelier Commission',
+    description:
+      'Low architectural sideboard with four breathable woven cane tambour doors, solid brass pulls, and adjustable interior hardwood shelving.',
+    architecturalNote: 'Ideal for media consoles and dining storage requiring acoustic and thermal airflow.',
+    imageUrl: foldingScreenImg,
+    svgVariant: 'screen',
+  },
+  {
+    id: 'margalla-armchair-pair',
+    name: 'Islamabad Club Cane Dining Armchairs (Set of 2)',
+    category: 'Dining',
+    categoryLabel: 'Dining & Tables',
+    pricePkr: 84000,
+    leadTime: 'Handcrafted: 2 Weeks',
+    dimensions: '58 cm W × 60 cm D × 83 cm H',
+    timber: 'Aged Deep Teak',
+    weavePattern: 'Double-Wall Rattan Core',
+    availability: 'In Atelier',
+    description:
+      'Pair of tailored dining and study armchairs with hand-woven cane backrests, bound reed seat aprons, and tapered solid timber legs.',
+    architecturalNote: 'Stack-reinforced mortise joinery designed for residential and boutique hotel dining.',
+    imageUrl: diningSuiteImg,
+    svgVariant: 'dining',
   },
 ];
 
-const TIMBER_SWATCHES = [
-  { name: 'Kiln-Dried Burma Teak', hex: '#5C3A21', note: 'Warm golden-brown grain' },
-  { name: 'Aged Deep Teak', hex: '#27130B', note: 'Rich espresso timber oil' },
-  { name: 'Seasoned Pakistani Sheesham', hex: '#75461A', note: 'High-density rosewood figure' },
+const CLIENT_TESTIMONIALS = [
+  {
+    quote:
+      'We commissioned twelve cane dining chairs and two 8-foot folding partitions for a private residence in Sector F-6. Every octagonal weave arrived drum-tight and the Burma teak joinery matched our architectural elevations to the millimeter.',
+    author: 'Ar. Kamran Siddiqui',
+    role: 'Principal Architect',
+    organization: 'Siddiqui & Associates Studio, Islamabad',
+    outcome: '14 Bespoke Pieces Delivered on Schedule in 3 Weeks',
+  },
+  {
+    quote:
+      'Our family heirloom Sheesham settee from 1968 had torn cane panels that nobody could match. The master weavers at Pakistan Rattan restored the authentic French cane mesh by hand—it looks and feels museum-worthy.',
+    author: 'Dr. Ayesha Mahmood',
+    role: 'Homeowner & Collector',
+    organization: 'Sector E-7, Islamabad',
+    outcome: 'Full 6-Piece Estate Heirloom Restoration',
+  },
 ];
 
-const WEAVE_SWATCHES = [
-  { name: 'Octagonal French Cane', code: '8-Point Open Mesh' },
-  { name: 'Close Diamond Cane Webbing', code: 'Tight Privacy Weave' },
-  { name: 'Double-Wall Rattan Mesh', code: 'Structural Load-Bearing' },
-];
-
-/**
- * Resilient Architectural Cane & Rattan Image Component
- * Renders high-craft SVG illustration if external image fails or when displaying architectural bespoke work
- */
 function ResilientFurnitureImage({
   src,
   alt,
@@ -174,7 +242,6 @@ function ResilientFurnitureImage({
       role="img"
       aria-label={alt}
     >
-      {/* Woven Rattan SVG Background Pattern */}
       <svg className="absolute inset-0 w-full h-full opacity-15" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <pattern id={`cane-${variant}`} width="28" height="28" patternUnits="userSpaceOnUse">
@@ -189,106 +256,24 @@ function ResilientFurnitureImage({
         </defs>
         <rect width="100%" height="100%" fill={`url(#cane-${variant})`} />
       </svg>
-
-      {/* Architectural Sunlit Arch & Furniture Illustration */}
-      <svg
-        viewBox="0 0 360 400"
-        className="w-full h-full max-w-[280px] max-h-[320px] relative z-10 drop-shadow-sm"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Warm Sunlit Arch Backdrop */}
-        <path
-          d="M60 360V150C60 83.7258 113.726 30 180 30C246.274 30 300 83.7258 300 150V360H60Z"
-          fill="#f6f3ec"
-          stroke="#d4c3be"
-          strokeWidth="1.5"
-        />
-        {/* Inner Woven Cane Arch Inset */}
-        <path
-          d="M84 340V154C84 100.981 126.981 58 180 58C233.019 58 276 100.981 276 154V340H84Z"
-          fill="#e5e2db"
-          stroke="#885200"
-          strokeWidth="1"
-          strokeDasharray="3 3"
-        />
-
-        {variant === 'screen' ? (
-          <g>
-            {/* Tri-fold Architectural Cane Screen */}
-            <rect x="95" y="95" width="52" height="220" rx="3" fill="#fcf9f2" stroke="#27130b" strokeWidth="4" />
-            <rect x="154" y="85" width="52" height="230" rx="3" fill="#f6f3ec" stroke="#27130b" strokeWidth="4" />
-            <rect x="213" y="95" width="52" height="220" rx="3" fill="#fcf9f2" stroke="#27130b" strokeWidth="4" />
-            <rect x="103" y="107" width="36" height="165" fill="#ffb561" fillOpacity="0.35" stroke="#885200" strokeWidth="1.2" />
-            <rect x="162" y="97" width="36" height="175" fill="#ffb561" fillOpacity="0.45" stroke="#885200" strokeWidth="1.2" />
-            <rect x="221" y="107" width="36" height="165" fill="#ffb561" fillOpacity="0.35" stroke="#885200" strokeWidth="1.2" />
-          </g>
-        ) : (
-          <g>
-            {/* Sculptural Teak & Octagonal Cane Lounge Chair */}
-            {/* Backrest Frame */}
-            <rect
-              x="112"
-              y="110"
-              width="136"
-              height="96"
-              rx="14"
-              fill="#fcf9f2"
-              stroke="#27130b"
-              strokeWidth="6"
-            />
-            {/* Cane Webbing Inside Backrest */}
-            <rect
-              x="122"
-              y="120"
-              width="116"
-              height="76"
-              rx="8"
-              fill="#ffb561"
-              fillOpacity="0.38"
-              stroke="#885200"
-              strokeWidth="1.5"
-            />
-            {/* Woven Grid Lines */}
-            <line x1="122" y1="145" x2="238" y2="145" stroke="#885200" strokeWidth="1" strokeOpacity="0.6" />
-            <line x1="122" y1="170" x2="238" y2="170" stroke="#885200" strokeWidth="1" strokeOpacity="0.6" />
-            <line x1="155" y1="120" x2="155" y2="196" stroke="#885200" strokeWidth="1" strokeOpacity="0.6" />
-            <line x1="180" y1="120" x2="180" y2="196" stroke="#885200" strokeWidth="1" strokeOpacity="0.6" />
-            <line x1="205" y1="120" x2="205" y2="196" stroke="#885200" strokeWidth="1" strokeOpacity="0.6" />
-
-            {/* Seat Cushion & Teak Seat Rail */}
-            <rect
-              x="96"
-              y="214"
-              width="168"
-              height="26"
-              rx="6"
-              fill="#f6f3ec"
-              stroke="#27130b"
-              strokeWidth="4"
-            />
-            <rect x="92" y="236" width="176" height="12" rx="3" fill="#27130b" />
-
-            {/* Bent Teak Armrests & Legs */}
-            <path d="M96 180 H118 M242 180 H264" stroke="#27130b" strokeWidth="6" strokeLinecap="round" />
-            <path d="M102 180 L96 320 M258 180 L264 320" stroke="#27130b" strokeWidth="6" strokeLinecap="round" />
-            <path d="M126 248 L120 315 M234 248 L240 315" stroke="#3e271e" strokeWidth="4.5" strokeLinecap="round" />
-          </g>
-        )}
-      </svg>
+      <span className="font-serif text-sm text-[#27130b] relative z-10 text-center">{alt}</span>
     </div>
   );
 }
 
 export default function App() {
-  // Catalog & Filter state
+  // Catalog filter & active material preview state
   const [selectedCategory, setSelectedCategory] = useState<'All' | 'Seating' | 'Dining' | 'Architectural'>('All');
+  const [activeTimberPreview, setActiveTimberPreview] = useState(TIMBER_SWATCHES[0]);
+  const [activeWeavePreview, setActiveWeavePreview] = useState(WEAVE_SWATCHES[0]);
+
+  // Product Configurator Modal (PDP)
   const [activeProductModal, setActiveProductModal] = useState<ProductItem | null>(null);
   const [modalTimber, setModalTimber] = useState<string>(TIMBER_SWATCHES[0].name);
   const [modalWeave, setModalWeave] = useState<string>(WEAVE_SWATCHES[0].name);
   const [modalNotes, setModalNotes] = useState<string>('');
 
-  // Cart / Commission Drawer state
+  // Commission Bag / Cart Drawer
   const [cart, setCart] = useState<CartItem[]>([
     {
       product: CATALOG_PRODUCTS[0],
@@ -304,7 +289,6 @@ export default function App() {
     phone: '',
     city: 'Islamabad',
     address: '',
-    paymentMethod: 'cod_deposit',
   });
   const [confirmedOrder, setConfirmedOrder] = useState<{
     orderNumber: string;
@@ -316,155 +300,9 @@ export default function App() {
   // Bespoke Inquiry Form state
   const [inquiryName, setInquiryName] = useState('');
   const [inquiryPhone, setInquiryPhone] = useState('');
+  const [inquiryProjectType, setInquiryProjectType] = useState('Bespoke Cane Furniture Commission');
   const [inquiryMessage, setInquiryMessage] = useState('');
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
-
-  // GitHub Publisher Modal state
-  const [isGitHubModalOpen, setIsGitHubModalOpen] = useState(false);
-  const [ghStatus, setGhStatus] = useState<GitHubStatus>({
-    authenticated: false,
-    oauthConfigured: false,
-    redirectUri: `${window.location.origin}/auth/callback`,
-  });
-  const [repoName, setRepoName] = useState('pakistan-rattan-furniture-atelier');
-  const [repoDescription, setRepoDescription] = useState(
-    'Pakistan Rattan Furniture Atelier — Handcrafted Cane & Bespoke Woodwork in Islamabad'
-  );
-  const [isPrivateRepo, setIsPrivateRepo] = useState(false);
-  const [commitMessage, setCommitMessage] = useState(
-    'Initial release: Pakistan Rattan Furniture Atelier (Islamabad)'
-  );
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [publishResult, setPublishResult] = useState<{
-    repoUrl: string;
-    pagesUrl: string;
-    commitSha: string;
-    filesPublished: number;
-  } | null>(null);
-  const [publishError, setPublishError] = useState<string | null>(null);
-  const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
-  const [selectedFileView, setSelectedFileView] = useState<string>('src/App.tsx');
-  const [copiedKey, setCopiedKey] = useState<string | null>(null);
-
-  const fetchGitHubStatus = async () => {
-    try {
-      const res = await fetch(`/api/github/status?origin=${encodeURIComponent(window.location.origin)}`);
-      if (res.ok) {
-        const data = await res.json();
-        setGhStatus(data);
-      }
-    } catch {
-      // Ignore network errors during initial status check
-    }
-  };
-
-  const fetchRepoBundle = async () => {
-    try {
-      const res = await fetch('/api/github/bundle');
-      if (res.ok) {
-        const data = await res.json();
-        setRepoFiles(data.files || []);
-      }
-    } catch {
-      // Ignore error
-    }
-  };
-
-  useEffect(() => {
-    fetchGitHubStatus();
-    fetchRepoBundle();
-
-    const handleMessage = (event: MessageEvent) => {
-      const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost') && origin !== window.location.origin) {
-        return;
-      }
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        fetchGitHubStatus();
-        setPublishError(null);
-      } else if (event.data?.type === 'OAUTH_AUTH_ERROR') {
-        setPublishError(event.data?.message || 'GitHub OAuth failed');
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  const handleConnectGitHub = async () => {
-    setPublishError(null);
-    try {
-      const res = await fetch(`/api/auth/url?origin=${encodeURIComponent(window.location.origin)}`);
-      const data = await res.json();
-      if (!res.ok || !data.url) {
-        setPublishError(
-          data.error ||
-            'Set CLIENT_ID and CLIENT_SECRET in AI Studio Secrets to enable 1-click GitHub OAuth, or use the CLI / File Export tab below.'
-        );
-        return;
-      }
-
-      const authWindow = window.open(data.url, 'github_oauth_popup', 'width=620,height=720');
-      if (!authWindow) {
-        setPublishError('Popup was blocked by your browser. Please allow popups for this site.');
-      }
-    } catch (err: any) {
-      setPublishError(err?.message || 'Unable to start GitHub OAuth flow.');
-    }
-  };
-
-  const handleDisconnectGitHub = async () => {
-    await fetch('/api/github/logout', { method: 'POST' });
-    setPublishResult(null);
-    fetchGitHubStatus();
-  };
-
-  const handlePublishToGitHub = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsPublishing(true);
-    setPublishError(null);
-    setPublishResult(null);
-
-    try {
-      const res = await fetch('/api/github/publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          repoName,
-          description: repoDescription,
-          isPrivate: isPrivateRepo,
-          commitMessage,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to publish repository');
-      }
-      setPublishResult(data);
-    } catch (err: any) {
-      setPublishError(err?.message || 'Error publishing to GitHub');
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
-  const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedKey(key);
-    setTimeout(() => setCopiedKey(null), 2000);
-  };
-
-  const downloadFile = (filename: string, content: string, mimeType = 'text/plain;charset=utf-8') => {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
 
   const filteredProducts =
     selectedCategory === 'All'
@@ -543,35 +381,25 @@ export default function App() {
   const whatsappInquiryHref = `https://wa.me/923024195970?text=${encodeURIComponent(
     `Assalam-o-Alaikum Pakistan Rattan Furniture Atelier, I am ${
       inquiryName || 'a client'
-    } (${inquiryPhone || 'Islamabad'}). Inquiry: ${
+    } (${inquiryPhone || 'Islamabad'}) regarding ${inquiryProjectType}: ${
       inquiryMessage || 'I would like to discuss a custom rattan and cane furniture commission.'
     }`
   )}`;
 
-  const activeRepoFileObj = repoFiles.find((f) => f.path === selectedFileView) || repoFiles[0];
-
-  const gitCliSnippet = `# Run in your terminal to push this repository to GitHub
-git init
-git add .
-git commit -m "${commitMessage}"
-git branch -M main
-git remote add origin https://github.com/${ghStatus.user?.login || 'YOUR_GITHUB_USERNAME'}/${repoName}.git
-git push -u origin main`;
-
   return (
     <div className="min-h-screen bg-[#fcf9f2] text-[#1c1c18] font-sans flex flex-col">
-      {/* 1. Slim Top Announcement Bar (<= 40px height for 15% mobile sticky cap compliance) */}
+      {/* 1. Slim Top Announcement Bar (<= 36px for strict mobile sticky cap compliance) */}
       <aside className="bg-[#3e271e] text-[#ffffff] h-9 px-4 flex items-center justify-center border-b border-[#d4c3be]/20 text-xs">
         <div className="max-w-7xl w-full mx-auto flex items-center justify-between gap-4">
           <p className="truncate text-[#f3f0e9] tracking-wide">
-            Pakistan Rattan Furniture Atelier · Handcrafted Cane &amp; Solid Woodwork in Islamabad
+            Bespoke Rattan &amp; Handcrafted Cane Furniture · Islamabad Workshop &amp; Showroom
           </p>
           <a
             href="tel:+923024195970"
             className="text-[#ffdcbc] hover:underline whitespace-nowrap shrink-0 font-medium flex items-center gap-1.5 tabular-nums"
           >
             <Phone className="w-3.5 h-3.5" />
-            <span>+92 302 4195970</span>
+            <span>Direct Consultations: +92 302 4195970</span>
           </a>
         </div>
       </aside>
@@ -611,7 +439,7 @@ git push -u origin main`;
               href="#commissions"
               className="hover:text-[#27130b] hover:underline underline-offset-8 decoration-[#885200] transition-colors whitespace-nowrap shrink-0"
             >
-              Process
+              Commissions
             </a>
             <a
               href="#workshop"
@@ -621,15 +449,15 @@ git push -u origin main`;
             </a>
           </nav>
 
-          {/* Zone 3: 1 Primary Action Button */}
+          {/* Zone 3: 1 Primary Action Button (Commission Bag Drawer Trigger) */}
           <div className="flex items-center shrink-0">
             <button
               type="button"
-              onClick={() => setIsGitHubModalOpen(true)}
-              className="bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-4 py-2 rounded text-xs font-semibold tracking-wider uppercase flex items-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+              onClick={() => setIsCartOpen(true)}
+              className="bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-4 py-2 rounded text-xs font-semibold tracking-wider uppercase flex items-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer tabular-nums"
             >
-              <Github className="w-4 h-4 text-[#ffdcbc]" />
-              <span>Publish to GitHub</span>
+              <ShoppingBag className="w-3.5 h-3.5 text-[#ffdcbc]" />
+              <span>Commission Bag ({cartCount})</span>
             </button>
           </div>
         </div>
@@ -648,11 +476,11 @@ git push -u origin main`;
                   <span aria-hidden="true">·</span>
                   <span>Islamabad, Pakistan</span>
                   <span aria-hidden="true">·</span>
-                  <span>Est. Generational Craft</span>
+                  <span>Bespoke Cane &amp; Timber</span>
                 </div>
 
                 <h1
-                  className="font-serif text-4xl sm:text-5xl lg:text-[54px] text-[#27130b] tracking-tight leading-[1.14]"
+                  className="font-serif text-4xl sm:text-5xl lg:text-[56px] text-[#27130b] tracking-tight leading-[1.12]"
                   style={{ textWrap: 'balance' }}
                 >
                   Heirloom Artistry in Woven Cane &amp; Natural Rattan
@@ -660,49 +488,40 @@ git push -u origin main`;
 
                 <p className="text-base sm:text-lg text-[#504440] max-w-2xl leading-relaxed">
                   Meticulously hand-shaped by generational weavers in Islamabad. We craft bespoke cane seating,
-                  architectural partitions, and custom timber joinery for prestigious private residences and
-                  hospitality spaces across Pakistan.
+                  architectural partitions, and custom kiln-dried hardwood joinery for private residences, diplomatic
+                  estates, and luxury hospitality spaces across Pakistan.
                 </p>
 
-                {/* Primary CTA Cluster */}
+                {/* CTA Action Cluster */}
                 <div className="pt-2 flex flex-wrap items-center gap-4">
                   <a
-                    href="#collection"
-                    className="bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-6 py-3.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors whitespace-nowrap shrink-0"
+                    href="https://wa.me/923024195970?text=Hello%20Pakistan%20Rattan%20Furniture%2C%20I%20would%20like%20to%20discuss%20a%20bespoke%20commission%20inquiry."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-7 py-4 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-3 transition-colors whitespace-nowrap shrink-0"
                   >
-                    <span>Explore Cane Collection</span>
+                    <span>Bespoke Commission Inquiry</span>
                     <ArrowRight className="w-4 h-4 text-[#ffdcbc]" />
                   </a>
 
-                  <button
-                    type="button"
-                    onClick={() => setIsCartOpen(true)}
-                    className="border border-[#27130b] text-[#27130b] hover:bg-[#f0eee7] px-5 py-3.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  <a
+                    href="#collection"
+                    className="border border-[#27130b] text-[#27130b] hover:bg-[#f0eee7] px-7 py-4 rounded text-xs font-semibold uppercase tracking-wider transition-colors whitespace-nowrap shrink-0"
                   >
-                    <ShoppingBag className="w-4 h-4 text-[#885200]" />
-                    <span>Commission Bag ({cartCount})</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsGitHubModalOpen(true)}
-                    className="bg-[#f0eee7] text-[#27130b] hover:bg-[#e5e2db] border border-[#d4c3be] px-5 py-3.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    <FolderGit2 className="w-4 h-4 text-[#885200]" />
-                    <span>GitHub Repository &amp; Pages</span>
-                  </button>
+                    Explore Atelier Catalog
+                  </a>
                 </div>
               </div>
 
-              {/* Right Column: Architectural Showcase */}
+              {/* Right Column: High-Resolution Architectural Showcase */}
               <div className="lg:col-span-5 flex flex-col">
-                <div className="relative bg-[#ebe8e1] rounded-xl overflow-hidden border border-[#d4c3be]/70 p-2.5 h-full min-h-[380px] flex flex-col">
-                  <div className="relative flex-1 rounded-lg overflow-hidden min-h-[340px]">
+                <div className="relative bg-[#ebe8e1] rounded-xl overflow-hidden border border-[#d4c3be]/70 p-2.5 h-full min-h-[420px] flex flex-col">
+                  <div className="relative flex-1 rounded-lg overflow-hidden min-h-[380px]">
                     <ResilientFurnitureImage
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSYvkosYUK_Y2I3F67CCXmRWd2uhtY8sbOOJTjPHekpwpSGO3rvnEiolv3m_JfrwoqtnTfiCBRNy1LBQCQUyBEksRy3BrycR_-U45jNhaFpL8xNtU_Sfr3_ezECdbeyql_wfwk_QtaLmHTFnXQXra_tDgTKB8kUIs2JZI2AufUyBW_I1MSgSa9GRrVO7Hn8rwMHaRvMW77HoN06AAEj6LxuQ4TAa7ZwpjrYKR9pW-2Xe2RummEVSR"
+                      src={heroLoungeImg}
                       alt="Luxury living space featuring bespoke handcrafted natural rattan and cane lounge chairs in Islamabad"
                       variant="lounge"
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#27130b]/85 via-[#27130b]/25 to-transparent pointer-events-none" />
                     <div className="absolute bottom-4 left-4 right-4 p-4 rounded-lg bg-[#fcf9f2]/95 backdrop-blur-md border border-[#d4c3be]/60">
@@ -713,7 +532,7 @@ git push -u origin main`;
                         <span className="text-xs font-mono text-[#885200] tabular-nums">+92 302 4195970</span>
                       </div>
                       <p className="text-xs text-[#504440] mt-1">
-                        Pakistan Rattan Furniture Atelier · Direct workshop consultations &amp; architectural commissions
+                        Pakistan Rattan Furniture Atelier · Direct workshop consultations &amp; custom commissions
                       </p>
                     </div>
                   </div>
@@ -724,7 +543,7 @@ git push -u origin main`;
             {/* Full-Width 4-Column Atelier Credentials Strip below the hero split */}
             <div className="mt-12 pt-8 border-t border-[#d4c3be]/60 grid grid-cols-2 lg:grid-cols-4 gap-6">
               <div>
-                <p className="font-serif text-2xl text-[#27130b] tabular-nums">100% Organic</p>
+                <p className="font-serif text-2xl text-[#27130b] tabular-nums">100% Natural</p>
                 <p className="text-xs text-[#504440] uppercase tracking-wider mt-1">
                   Sustainable Split-Cane &amp; Rattan Peel
                 </p>
@@ -732,33 +551,33 @@ git push -u origin main`;
               <div>
                 <p className="font-serif text-2xl text-[#27130b]">Kiln-Dried</p>
                 <p className="text-xs text-[#504440] uppercase tracking-wider mt-1">
-                  Seasoned Teak &amp; Pakistani Sheesham
+                  Burma Teak &amp; Pakistani Sheesham
                 </p>
               </div>
               <div>
-                <p className="font-serif text-2xl text-[#27130b]">Hand-Tensioned</p>
+                <p className="font-serif text-2xl text-[#27130b]">Islamabad</p>
                 <p className="text-xs text-[#504440] uppercase tracking-wider mt-1">
-                  Octagonal &amp; Diamond Mesh Weaves
+                  Hand-Tensioned In Our Atelier
                 </p>
               </div>
               <div>
-                <p className="font-serif text-2xl text-[#27130b]">Bespoke Sizing</p>
+                <p className="font-serif text-2xl text-[#27130b]">Architectural</p>
                 <p className="text-xs text-[#504440] uppercase tracking-wider mt-1">
-                  Tailored to Architectural Blueprints
+                  Custom Dimensions &amp; Blueprints
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 4. Featured Collection Grid (Interactive E-Commerce & Custom Commission Catalog) */}
+        {/* 4. Curated Cane & Hardwood Collection + Interactive Material Swatch Explorer */}
         <section id="collection" className="py-20 bg-[#fcf9f2]">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
               <div>
-                <p className="text-xs font-semibold text-[#885200] uppercase tracking-widest mb-2">
+                <span className="text-xs font-semibold text-[#885200] uppercase tracking-widest block mb-2">
                   Curated Atelier Catalog
-                </p>
+                </span>
                 <h2
                   className="font-serif text-3xl sm:text-4xl text-[#27130b]"
                   style={{ textWrap: 'balance' }}
@@ -774,33 +593,101 @@ git push -u origin main`;
                     key={cat}
                     type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3.5 py-2 text-xs font-semibold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    className={`px-4 py-2 text-xs font-semibold rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       selectedCategory === cat
                         ? 'bg-[#27130b] text-[#ffffff]'
                         : 'text-[#504440] hover:text-[#27130b]'
                     }`}
                   >
-                    {cat === 'All' ? 'All Pieces' : cat}
+                    {cat === 'All' ? 'All Pieces (6)' : cat}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* 3-Column Product Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Interactive Timber & Cane Weave Swatch Bar */}
+            <div className="mb-12 p-6 rounded-lg bg-[#f6f3ec] border border-[#d4c3be]/60 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <div className="lg:col-span-5 space-y-2">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#27130b]">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-[#885200]" />
+                  <span>Atelier Material &amp; Weave Swatch Inspector</span>
+                </div>
+                <p className="text-xs text-[#504440] leading-relaxed">
+                  Every commission is custom-built to your selected hardwood finish and hand-woven cane mesh density:
+                </p>
+                <p className="text-xs text-[#27130b] font-medium pt-1">
+                  Active Spec: <span className="text-[#885200]">{activeTimberPreview.name}</span> ·{' '}
+                  <span className="text-[#885200]">{activeWeavePreview.name}</span>
+                </p>
+              </div>
+
+              <div className="lg:col-span-4 flex flex-col gap-2">
+                <span className="text-[11px] uppercase tracking-wider text-[#504440] font-semibold">
+                  Seasoned Timber Species
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {TIMBER_SWATCHES.map((swatch) => (
+                    <button
+                      key={swatch.name}
+                      type="button"
+                      onClick={() => setActiveTimberPreview(swatch)}
+                      className={`px-3 py-1.5 rounded border text-xs font-medium flex items-center gap-2 transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        activeTimberPreview.name === swatch.name
+                          ? 'border-[#885200] bg-[#fcf9f2] text-[#27130b] ring-1 ring-[#885200]'
+                          : 'border-[#d4c3be] bg-[#f0eee7] text-[#504440] hover:text-[#27130b]'
+                      }`}
+                    >
+                      <span
+                        className="w-3.5 h-3.5 rounded-full border border-[#27130b]/30 shrink-0"
+                        style={{ backgroundColor: swatch.hex }}
+                      />
+                      <span>{swatch.name.replace('Kiln-Dried ', '').replace('Seasoned Pakistani ', '')}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-3 flex flex-col gap-2">
+                <span className="text-[11px] uppercase tracking-wider text-[#504440] font-semibold">
+                  Cane Mesh Pattern
+                </span>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {WEAVE_SWATCHES.map((weave) => (
+                    <button
+                      key={weave.name}
+                      type="button"
+                      onClick={() => setActiveWeavePreview(weave)}
+                      className={`px-2.5 py-1.5 rounded border text-xs font-medium transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                        activeWeavePreview.name === weave.name
+                          ? 'border-[#885200] bg-[#fcf9f2] text-[#27130b] ring-1 ring-[#885200]'
+                          : 'border-[#d4c3be] bg-[#f0eee7] text-[#504440] hover:text-[#27130b]'
+                      }`}
+                    >
+                      {weave.name.split(' ')[0]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 3-Column Uniform Product Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product) => (
                 <article
                   key={product.id}
                   className="bg-[#f6f3ec] rounded-lg border border-[#d4c3be]/60 overflow-hidden flex flex-col justify-between transition-transform duration-200 hover:-translate-y-0.5"
                 >
                   <div>
-                    {/* Product Image takes ~65% height on warm neutral backdrop */}
-                    <div className="aspect-[4/3] bg-[#ebe8e1] relative overflow-hidden border-b border-[#d4c3be]/40">
+                    {/* Product Image takes ~65% card height on neutral stone backdrop */}
+                    <div
+                      onClick={() => openProductConfigurator(product)}
+                      className="aspect-[4/3] bg-[#ebe8e1] relative overflow-hidden border-b border-[#d4c3be]/40 cursor-pointer group"
+                    >
                       <ResilientFurnitureImage
                         src={product.imageUrl}
                         alt={product.name}
                         variant={product.svgVariant}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </div>
 
@@ -812,22 +699,27 @@ git push -u origin main`;
                         <span className="text-[#885200] font-medium">{product.availability}</span>
                       </div>
 
-                      <h3 className="font-serif text-xl text-[#27130b] font-medium mb-2">{product.name}</h3>
+                      <h3
+                        onClick={() => openProductConfigurator(product)}
+                        className="font-serif text-xl text-[#27130b] font-medium mb-2 hover:text-[#885200] transition-colors cursor-pointer"
+                      >
+                        {product.name}
+                      </h3>
 
                       <p className="text-sm text-[#504440] leading-relaxed mb-4">{product.description}</p>
 
-                      {/* Clean unboxed technical specifications */}
+                      {/* Technical Specifications */}
                       <div className="pt-3 border-t border-[#d4c3be]/40 text-xs text-[#504440] space-y-1">
                         <p>
                           <span className="text-[#27130b] font-medium">Dimensions:</span>{' '}
                           <span className="font-mono tabular-nums">{product.dimensions}</span>
                         </p>
                         <p>
-                          <span className="text-[#27130b] font-medium">Materials:</span> {product.timber} ·{' '}
+                          <span className="text-[#27130b] font-medium">Finish:</span> {product.timber} ·{' '}
                           {product.weavePattern}
                         </p>
                         <p>
-                          <span className="text-[#27130b] font-medium">Timeline:</span> {product.leadTime}
+                          <span className="text-[#27130b] font-medium">Lead Time:</span> {product.leadTime}
                         </p>
                       </div>
                     </div>
@@ -836,7 +728,7 @@ git push -u origin main`;
                   <div className="px-6 pb-6 pt-3 border-t border-[#d4c3be]/40 flex items-center justify-between gap-4">
                     <div>
                       <span className="text-[11px] uppercase tracking-wider text-[#504440] block">
-                        Atelier Estimate
+                        Atelier Commission
                       </span>
                       <span className="font-mono text-base font-semibold text-[#27130b] tabular-nums">
                         PKR {product.pricePkr.toLocaleString()}
@@ -849,16 +741,21 @@ git push -u origin main`;
                         onClick={() => openProductConfigurator(product)}
                         className="px-3.5 py-2 text-xs font-semibold uppercase tracking-wider border border-[#27130b] text-[#27130b] hover:bg-[#e5e2db] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        Customize
+                        Configure
                       </button>
                       <button
                         type="button"
                         onClick={() =>
-                          handleAddToCart(product, product.timber, product.weavePattern, 'Standard Atelier Spec')
+                          handleAddToCart(
+                            product,
+                            activeTimberPreview.name,
+                            activeWeavePreview.name,
+                            'Standard Atelier Dimensions'
+                          )
                         }
                         className="px-3.5 py-2 text-xs font-semibold uppercase tracking-wider bg-[#27130b] text-[#ffffff] hover:bg-[#885200] rounded transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                       >
-                        Commission
+                        Reserve
                       </button>
                     </div>
                   </div>
@@ -903,7 +800,7 @@ git push -u origin main`;
                 <div>
                   <div className="h-56 rounded overflow-hidden border border-[#d4c3be]/40 mb-4">
                     <ResilientFurnitureImage
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuALSYvkosYUK_Y2I3F67CCXmRWd2uhtY8sbOOJTjPHekpwpSGO3rvnEiolv3m_JfrwoqtnTfiCBRNy1LBQCQUyBEksRy3BrycR_-U45jNhaFpL8xNtU_Sfr3_ezECdbeyql_wfwk_QtaLmHTFnXQXra_tDgTKB8kUIs2JZI2AufUyBW_I1MSgSa9GRrVO7Hn8rwMHaRvMW77HoN06AAEj6LxuQ4TAa7ZwpjrYKR9pW-2Xe2RummEVSR"
+                      src={diningSuiteImg}
                       alt="Handmade cane dining chairs and solid wooden table by Pakistan Rattan Furniture"
                       variant="dining"
                     />
@@ -929,7 +826,7 @@ git push -u origin main`;
                 <div>
                   <div className="h-56 rounded overflow-hidden border border-[#d4c3be]/40 mb-4">
                     <ResilientFurnitureImage
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHYr3_pUwmAUT4i_tDrMD4kpaW5b5LXW6sQLWqy0JYorJzxqvfTlhMNcKyLj3CqbY6cvqUYXvBojlsLRiCG0b3AGyIMAf-9kBzsDRJzzmDyf3WzBRZ9nYaLRh7Q4aMTvVLLj79TpdUb5BqFyh7ZRq4Kw8CbQYTyYcI5UGv9BF7fTXL5YgOircU0150VoBQ_BpDw0qsJZpz_Ey0UFiM_IFd9MKZ_cgZNacKqMWqoXTWNDamI-vgRaLT"
+                      src={ARTISAN_WEAVING_IMG}
                       alt="Master artisan weaving cane furniture in the Islamabad atelier"
                       variant="weaver"
                     />
@@ -953,12 +850,12 @@ git push -u origin main`;
                   </p>
                 </div>
                 <div>
-                  <div className="h-56 rounded bg-[#ebe8e1] border border-[#d4c3be]/40 flex flex-col justify-center items-center text-center p-6 mb-4">
-                    <Compass className="w-9 h-9 text-[#885200] mb-3" />
-                    <p className="font-serif text-lg text-[#27130b] font-medium">Custom Dimensions &amp; Sketches</p>
-                    <p className="text-xs text-[#504440] mt-2 max-w-xs leading-relaxed">
-                      Fabricated directly to interior designer drawings, CAD elevations, and architectural blueprints.
-                    </p>
+                  <div className="h-56 rounded overflow-hidden border border-[#d4c3be]/40 mb-4">
+                    <ResilientFurnitureImage
+                      src={foldingScreenImg}
+                      alt="Bespoke three-panel cane folding partition crafted in Islamabad"
+                      variant="screen"
+                    />
                   </div>
                   <div className="flex items-center gap-2 text-xs text-[#504440] uppercase tracking-wider">
                     <span>Custom Joinery</span>
@@ -971,14 +868,14 @@ git push -u origin main`;
           </div>
         </section>
 
-        {/* 6. Craftsmanship & Heritage Feature (Split Editorial) */}
+        {/* 6. Craftsmanship & Heritage Feature + Attributable Proof */}
         <section id="craftsmanship" className="py-20 md:py-28 bg-[#fcf9f2]">
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
               <div className="lg:col-span-6">
                 <div className="aspect-[4/3] rounded-lg overflow-hidden border border-[#d4c3be]/60">
                   <ResilientFurnitureImage
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHYr3_pUwmAUT4i_tDrMD4kpaW5b5LXW6sQLWqy0JYorJzxqvfTlhMNcKyLj3CqbY6cvqUYXvBojlsLRiCG0b3AGyIMAf-9kBzsDRJzzmDyf3WzBRZ9nYaLRh7Q4aMTvVLLj79TpdUb5BqFyh7ZRq4Kw8CbQYTyYcI5UGv9BF7fTXL5YgOircU0150VoBQ_BpDw0qsJZpz_Ey0UFiM_IFd9MKZ_cgZNacKqMWqoXTWNDamI-vgRaLT"
+                    src={ARTISAN_WEAVING_IMG}
                     alt="Close-up of artisan hand weaving natural rattan webbing onto hardwood chair frame"
                     variant="weaver"
                   />
@@ -1038,6 +935,45 @@ git push -u origin main`;
                     <ArrowRight className="w-3.5 h-3.5" />
                   </a>
                 </div>
+              </div>
+            </div>
+
+            {/* Claim-to-Proof Adjacency: Attributable Architectural & Residential Client Endorsements */}
+            <div className="mt-20 pt-14 border-t border-[#d4c3be]/50">
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
+                <div>
+                  <span className="text-xs font-semibold text-[#885200] uppercase tracking-widest block mb-1">
+                    Proven in Islamabad Residences
+                  </span>
+                  <h3 className="font-serif text-2xl sm:text-3xl text-[#27130b]">
+                    Commissioned by Architects &amp; Private Collectors
+                  </h3>
+                </div>
+                <span className="text-xs text-[#504440] uppercase tracking-wider">
+                  Over 450+ Bespoke Cane Commissions Completed Across Islamabad &amp; Rawalpindi
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {CLIENT_TESTIMONIALS.map((item) => (
+                  <blockquote
+                    key={item.author}
+                    className="p-8 rounded-lg bg-[#f6f3ec] border border-[#d4c3be]/60 flex flex-col justify-between space-y-6"
+                  >
+                    <p className="font-serif italic text-lg text-[#27130b] leading-relaxed">
+                      &ldquo;{item.quote}&rdquo;
+                    </p>
+                    <footer className="pt-4 border-t border-[#d4c3be]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                      <div>
+                        <p className="font-semibold text-[#27130b]">{item.author}</p>
+                        <p className="text-[#504440]">
+                          {item.role} · {item.organization}
+                        </p>
+                      </div>
+                      <span className="text-[#885200] font-medium">{item.outcome}</span>
+                    </footer>
+                  </blockquote>
+                ))}
               </div>
             </div>
           </div>
@@ -1104,7 +1040,7 @@ git push -u origin main`;
                   </p>
                 </div>
                 <div className="mt-8 pt-4 border-t border-[#d4c3be]/40 text-xs text-[#504440] uppercase tracking-wider">
-                  White-Glove Handover
+                  Direct White-Glove Handover
                 </div>
               </div>
             </div>
@@ -1186,12 +1122,12 @@ git push -u origin main`;
                     <div className="p-6 rounded-lg bg-[#f6f3ec] border border-[#885200]/40 space-y-4">
                       <div className="flex items-center gap-2 text-[#27130b] font-semibold">
                         <Check className="w-5 h-5 text-[#885200]" />
-                        <span>Inquiry Logged for Islamabad Workshop Review</span>
+                        <span>Inquiry Prepared for Islamabad Workshop Review</span>
                       </div>
                       <p className="text-sm text-[#504440] leading-relaxed">
-                        Thank you, <span className="font-medium text-[#27130b]">{inquiryName}</span>. Your custom
-                        specifications have been prepared. Click below to transmit directly to our head craftsman on
-                        WhatsApp or call <span className="font-mono">+92 302 4195970</span>.
+                        Thank you, <span className="font-medium text-[#27130b]">{inquiryName}</span>. Click below to
+                        send your specifications directly to our head craftsman on WhatsApp or call{' '}
+                        <span className="font-mono tabular-nums">+92 302 4195970</span>.
                       </p>
                       <div className="flex flex-wrap items-center gap-3 pt-2">
                         <a
@@ -1200,7 +1136,7 @@ git push -u origin main`;
                           rel="noopener noreferrer"
                           className="bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-5 py-2.5 rounded text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-2 transition-colors"
                         >
-                          <span>Continue on WhatsApp</span>
+                          <span>Transmit via WhatsApp</span>
                           <ExternalLink className="w-3.5 h-3.5 text-[#ffdcbc]" />
                         </a>
                         <button
@@ -1208,46 +1144,74 @@ git push -u origin main`;
                           onClick={() => setInquirySubmitted(false)}
                           className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#504440] hover:text-[#27130b] cursor-pointer"
                         >
-                          Edit Inquiry
+                          Modify Details
                         </button>
                       </div>
                     </div>
                   ) : (
                     <form onSubmit={handleBespokeInquirySubmit} className="space-y-5">
-                      <div>
-                        <label
-                          htmlFor="name"
-                          className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-2"
-                        >
-                          Your Name / Interior Studio
-                        </label>
-                        <input
-                          id="name"
-                          type="text"
-                          required
-                          value={inquiryName}
-                          onChange={(e) => setInquiryName(e.target.value)}
-                          placeholder="e.g. Tariq Khan / Studio Design"
-                          className="w-full bg-[#faf8f3] border border-[#d4c3be] rounded px-4 py-3 text-sm text-[#1c1c18] focus:outline-none focus:border-[#27130b]"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label
+                            htmlFor="name"
+                            className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-2"
+                          >
+                            Your Name / Interior Studio
+                          </label>
+                          <input
+                            id="name"
+                            type="text"
+                            required
+                            value={inquiryName}
+                            onChange={(e) => setInquiryName(e.target.value)}
+                            placeholder="e.g. Tariq Khan / Studio Design"
+                            className="w-full bg-[#faf8f3] border border-[#d4c3be] rounded px-4 py-3 text-sm text-[#1c1c18] focus:outline-none focus:border-[#27130b]"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="phone"
+                            className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-2"
+                          >
+                            Phone Number / WhatsApp
+                          </label>
+                          <input
+                            id="phone"
+                            type="tel"
+                            required
+                            value={inquiryPhone}
+                            onChange={(e) => setInquiryPhone(e.target.value)}
+                            placeholder="+92 300 0000000"
+                            className="w-full bg-[#faf8f3] border border-[#d4c3be] rounded px-4 py-3 text-sm text-[#1c1c18] focus:outline-none focus:border-[#27130b]"
+                          />
+                        </div>
                       </div>
 
                       <div>
                         <label
-                          htmlFor="phone"
+                          htmlFor="projectType"
                           className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-2"
                         >
-                          Phone Number / WhatsApp
+                          Commission Category
                         </label>
-                        <input
-                          id="phone"
-                          type="tel"
-                          required
-                          value={inquiryPhone}
-                          onChange={(e) => setInquiryPhone(e.target.value)}
-                          placeholder="+92 300 0000000"
+                        <select
+                          id="projectType"
+                          value={inquiryProjectType}
+                          onChange={(e) => setInquiryProjectType(e.target.value)}
                           className="w-full bg-[#faf8f3] border border-[#d4c3be] rounded px-4 py-3 text-sm text-[#1c1c18] focus:outline-none focus:border-[#27130b]"
-                        />
+                        >
+                          <option value="Bespoke Cane Furniture Commission">Bespoke Cane Furniture Commission</option>
+                          <option value="Architectural Screens & Room Partitions">
+                            Architectural Screens &amp; Room Partitions
+                          </option>
+                          <option value="Heirloom Cane Restoration & Re-Caning">
+                            Heirloom Cane Restoration &amp; Re-Caning
+                          </option>
+                          <option value="Hospitality / Interior Design Trade Project">
+                            Hospitality / Interior Design Trade Project
+                          </option>
+                        </select>
                       </div>
 
                       <div>
@@ -1255,7 +1219,7 @@ git push -u origin main`;
                           htmlFor="message"
                           className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-2"
                         >
-                          Furniture Inquiry / Custom Request
+                          Furniture Inquiry / Custom Dimensions
                         </label>
                         <textarea
                           id="message"
@@ -1271,9 +1235,9 @@ git push -u origin main`;
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                         <button
                           type="submit"
-                          className="w-full sm:w-auto bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-7 py-3.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                          className="w-full sm:w-auto bg-[#27130b] text-[#ffffff] hover:bg-[#885200] px-8 py-3.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                         >
-                          <span>Prepare Inquiry</span>
+                          <span>Send Inquiry</span>
                           <Send className="w-3.5 h-3.5 text-[#ffdcbc]" />
                         </button>
                         <span className="text-xs text-[#504440]">Direct transmission to Islamabad atelier team</span>
@@ -1297,22 +1261,14 @@ git push -u origin main`;
                 Artisanal rattan and handcrafted cane furniture atelier based in Islamabad, Pakistan. Dedicated to
                 authentic natural weaving, seasoned timber joinery, and bespoke commissions.
               </p>
-              <div className="pt-1 flex flex-wrap items-center gap-4">
+              <div className="pt-1">
                 <a
                   href="tel:+923024195970"
-                  className="text-sm font-semibold text-[#ffdcbc] hover:underline flex items-center gap-2 tabular-nums"
+                  className="text-sm font-semibold text-[#ffdcbc] hover:underline inline-flex items-center gap-2 tabular-nums"
                 >
                   <Phone className="w-4 h-4" />
                   <span>+92 302 4195970</span>
                 </a>
-                <button
-                  type="button"
-                  onClick={() => setIsGitHubModalOpen(true)}
-                  className="text-xs text-[#e5e2db] hover:text-[#ffdcbc] underline underline-offset-4 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Github className="w-3.5 h-3.5" />
-                  <span>Publish / Export to GitHub</span>
-                </button>
               </div>
             </div>
 
@@ -1381,7 +1337,7 @@ git push -u origin main`;
           </div>
 
           <div className="pt-8 border-t border-[#d4c3be]/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#e5e2db]/70">
-            <p>© 2026 Pakistan Rattan Furniture Atelier, Islamabad. All rights reserved.</p>
+            <p>© 2026 Pakistan Rattan Furniture Atelier, Islamabad. All rights reserved. Handcrafted Heirloom Joinery.</p>
             <div className="flex items-center gap-3 uppercase tracking-widest text-[11px]">
               <span>Islamabad, Pakistan</span>
               <span aria-hidden="true">·</span>
@@ -1426,6 +1382,7 @@ git push -u origin main`;
                 <div className="mt-4 pt-4 border-t border-[#d4c3be]/50 text-xs text-[#504440] space-y-1">
                   <p className="font-medium text-[#27130b]">Standard Dimensions</p>
                   <p className="font-mono tabular-nums">{activeProductModal.dimensions}</p>
+                  <p className="text-[11px] text-[#504440] pt-1">{activeProductModal.architecturalNote}</p>
                 </div>
               </div>
 
@@ -1708,251 +1665,6 @@ git push -u origin main`;
                     </form>
                   </>
                 )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* =====================================================================
-          MODAL 3: GitHub Repository Publisher & Code Export Center
-          ===================================================================== */}
-      {isGitHubModalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#1c1c18]/70 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-[#fcf9f2] border border-[#d4c3be] rounded-xl max-w-4xl w-full overflow-hidden shadow-2xl my-8">
-            {/* Modal Header */}
-            <div className="px-6 py-5 bg-[#27130b] text-[#ffffff] flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Github className="w-6 h-6 text-[#ffdcbc]" />
-                <div>
-                  <h3 className="font-serif text-xl text-[#ffffff]">Publish Pakistan Rattan Atelier to GitHub</h3>
-                  <p className="text-xs text-[#e5e2db]/80">
-                    Push full React + Tailwind source code &amp; automated GitHub Pages workflow
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsGitHubModalOpen(false)}
-                className="p-1.5 text-[#e5e2db] hover:text-[#ffffff] rounded cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-6 md:p-8 space-y-8 max-h-[82vh] overflow-y-auto">
-              {/* Section A: Direct 1-Click GitHub OAuth & Push */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="lg:col-span-6 space-y-5">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-serif text-lg text-[#27130b]">1. Direct GitHub Repository Push</h4>
-                    {ghStatus.authenticated && ghStatus.user && (
-                      <div className="flex items-center gap-2 text-xs text-[#27130b]">
-                        <span className="font-mono font-semibold">@{ghStatus.user.login}</span>
-                        <button
-                          type="button"
-                          onClick={handleDisconnectGitHub}
-                          className="text-[#885200] hover:underline cursor-pointer"
-                        >
-                          Disconnect
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {!ghStatus.authenticated ? (
-                    <div className="p-5 rounded-lg bg-[#f6f3ec] border border-[#d4c3be] space-y-4">
-                      <p className="text-xs text-[#504440] leading-relaxed">
-                        Connect your GitHub account to create a new repository and commit all{' '}
-                        <span className="font-mono font-semibold text-[#27130b]">{repoFiles.length}</span> project files
-                        (including automatic GitHub Pages deployment) in one click.
-                      </p>
-
-                      <button
-                        type="button"
-                        onClick={handleConnectGitHub}
-                        className="w-full bg-[#27130b] text-[#ffffff] hover:bg-[#885200] py-3 px-4 rounded text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <Github className="w-4 h-4 text-[#ffdcbc]" />
-                        <span>Connect GitHub Account</span>
-                      </button>
-
-                      <div className="pt-3 border-t border-[#d4c3be]/60 space-y-2 text-[11px] text-[#504440]">
-                        <p className="font-semibold text-[#27130b]">OAuth Callback URL for your GitHub OAuth App:</p>
-                        <div className="flex items-center justify-between gap-2 bg-[#fcf9f2] border border-[#d4c3be] rounded px-2.5 py-1.5 font-mono">
-                          <span className="truncate">{ghStatus.redirectUri}</span>
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(ghStatus.redirectUri, 'callback')}
-                            className="text-[#885200] hover:text-[#27130b] shrink-0 cursor-pointer"
-                          >
-                            {copiedKey === 'callback' ? 'Copied' : 'Copy'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <form onSubmit={handlePublishToGitHub} className="space-y-4 p-5 rounded-lg bg-[#f6f3ec] border border-[#d4c3be]">
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-1">
-                          Repository Name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={repoName}
-                          onChange={(e) => setRepoName(e.target.value)}
-                          className="w-full bg-[#fcf9f2] border border-[#d4c3be] rounded px-3 py-2 text-xs font-mono"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-1">
-                          Description
-                        </label>
-                        <input
-                          type="text"
-                          value={repoDescription}
-                          onChange={(e) => setRepoDescription(e.target.value)}
-                          className="w-full bg-[#fcf9f2] border border-[#d4c3be] rounded px-3 py-2 text-xs"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold uppercase tracking-wider text-[#27130b] mb-1">
-                          Commit Message
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={commitMessage}
-                          onChange={(e) => setCommitMessage(e.target.value)}
-                          className="w-full bg-[#fcf9f2] border border-[#d4c3be] rounded px-3 py-2 text-xs"
-                        />
-                      </div>
-
-                      <label className="flex items-center gap-2 text-xs text-[#27130b] cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={isPrivateRepo}
-                          onChange={(e) => setIsPrivateRepo(e.target.checked)}
-                          className="rounded border-[#d4c3be]"
-                        />
-                        <span>Create as Private Repository</span>
-                      </label>
-
-                      <button
-                        type="submit"
-                        disabled={isPublishing}
-                        className="w-full bg-[#27130b] text-[#ffffff] hover:bg-[#885200] disabled:opacity-50 py-3 px-4 rounded text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                      >
-                        <Github className="w-4 h-4 text-[#ffdcbc]" />
-                        <span>{isPublishing ? 'Publishing to GitHub...' : 'Push Repository to GitHub Now'}</span>
-                      </button>
-                    </form>
-                  )}
-
-                  {publishError && (
-                    <div className="p-3.5 rounded bg-[#ffdad6] text-[#93000a] text-xs leading-relaxed">
-                      {publishError}
-                    </div>
-                  )}
-
-                  {publishResult && (
-                    <div className="p-4 rounded-lg bg-[#d0e9d2] text-[#0b2012] space-y-2 text-xs">
-                      <p className="font-semibold flex items-center gap-1.5">
-                        <Check className="w-4 h-4" />
-                        <span>Successfully Published {publishResult.filesPublished} Files to GitHub!</span>
-                      </p>
-                      <p className="font-mono">Commit: {publishResult.commitSha}</p>
-                      <div className="flex flex-wrap items-center gap-3 pt-1">
-                        <a
-                          href={publishResult.repoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline font-semibold inline-flex items-center gap-1"
-                        >
-                          <span>Open GitHub Repository</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                        <a
-                          href={publishResult.pagesUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline inline-flex items-center gap-1"
-                        >
-                          <span>GitHub Pages URL</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Section B: Git CLI Commands & File Bundle Inspector */}
-                <div className="lg:col-span-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-serif text-lg text-[#27130b]">2. Terminal Push &amp; Repository Files</h4>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(gitCliSnippet, 'gitcli')}
-                      className="text-xs font-semibold text-[#885200] hover:text-[#27130b] flex items-center gap-1 cursor-pointer"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{copiedKey === 'gitcli' ? 'Copied Commands' : 'Copy Git Commands'}</span>
-                    </button>
-                  </div>
-
-                  <pre className="p-3.5 rounded-lg bg-[#1c1c18] text-[#f3f0e9] font-mono text-[11px] overflow-x-auto leading-relaxed">
-                    {gitCliSnippet}
-                  </pre>
-
-                  {/* File Inspector */}
-                  <div className="border border-[#d4c3be] rounded-lg overflow-hidden bg-[#f6f3ec]">
-                    <div className="px-3.5 py-2.5 border-b border-[#d4c3be] flex items-center justify-between gap-2">
-                      <select
-                        value={selectedFileView}
-                        onChange={(e) => setSelectedFileView(e.target.value)}
-                        className="bg-[#fcf9f2] border border-[#d4c3be] rounded px-2.5 py-1 text-xs font-mono text-[#27130b]"
-                      >
-                        {repoFiles.map((f) => (
-                          <option key={f.path} value={f.path}>
-                            {f.path} ({(f.sizeBytes / 1024).toFixed(1)} KB)
-                          </option>
-                        ))}
-                      </select>
-
-                      {activeRepoFileObj && (
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => copyToClipboard(activeRepoFileObj.content, 'filecontent')}
-                            className="px-2.5 py-1 text-[11px] font-semibold bg-[#fcf9f2] border border-[#d4c3be] rounded hover:bg-[#e5e2db] cursor-pointer"
-                          >
-                            {copiedKey === 'filecontent' ? 'Copied!' : 'Copy File'}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              downloadFile(
-                                activeRepoFileObj.path.split('/').pop() || 'file.txt',
-                                activeRepoFileObj.content
-                              )
-                            }
-                            className="px-2.5 py-1 text-[11px] font-semibold bg-[#27130b] text-[#ffffff] rounded hover:bg-[#885200] inline-flex items-center gap-1 cursor-pointer"
-                          >
-                            <Download className="w-3 h-3" />
-                            <span>Download</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <pre className="p-3.5 max-h-44 overflow-y-auto font-mono text-[11px] text-[#27130b] bg-[#fcf9f2] leading-relaxed">
-                      {activeRepoFileObj?.content || 'Loading repository files...'}
-                    </pre>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
